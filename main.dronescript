@@ -1,0 +1,27 @@
+version 5 variant SHEEP-A
+  compile-to: boston-spot-core
+  include: builtins/drone.include
+  include: variant-builtins/sheepa.include
+  function main{
+    sheepa.camera-boot();
+    sheepa.realism.death-detector.attach(sheepa.heteromorph.meat-prepare then sheepa.heteromorph.meat-activate-after(1sec) then sheepa.heteromorph.circuit-disable);
+    drone.sensors-attach(sheepa.sensors);
+    drone.mobility.legs-attach(sheepa.legs);
+    drone.onFuelLow.attach(sheepa.bend then sheepa.eat then sheepa.burn-stomach-contents)
+    drone.provide-modes(
+      roam {
+        drone.getRandomMovement().activate();
+        drone.onSeeIrregularity(drone.setMode(spying))
+      }
+      spooked {
+        drone.setMovement(drone.speed.RUNNING);
+        drone.runAway();
+      }
+      spying {
+        drone.camera.readCameraDataToStorage();
+        drone.network.uploadAllData();
+        drone.onDiscovered(drone.setMode(spooked));
+      }
+    );
+    drone.random-modes(roam, spooked);
+  }
